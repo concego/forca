@@ -8,16 +8,19 @@ O **Forca Inclusiva** é um Progressive Web App (PWA) desenvolvido para ser a ve
 - **Feedback Auditivo (Scan de Áudio):** Sistema de varredura sonora da palavra secreta:
   - **Bipe Grave (330Hz):** Representa letras ocultas (pontos).
   - **Bipe Agudo (660Hz):** Representa letras já reveladas.
+- **Normalização Inteligente:** Aceita caracteres de A a Z. Letras com acentos ou cedilha (ex: Á, Ã, Ç) são validadas automaticamente ao digitar a letra base (ex: A, C).
+- **Tratamento de Repetições:** Tentar uma letra já usada emite um sinal sonoro diferenciado e não desconta pontos/vidas.
 - **Localização Estrita (Bilíngue):** Interface 100% dinâmica em **Português** e **Inglês**, sem mistura de terminologias.
-- **Categorias Diversificadas:** Artes, História, Geografia, Ciência, Animais, Esportes e a opção **Aleatório**.
+- **Categorias Diversificadas:** Artes, História, Geografia, Ciência, Animais, Esportes.
+- **Modo Aleatório:** Mistura palavras de todas as categorias em uma única partida para maior desafio.
 - **Níveis de Dificuldade:** Fácil, Médio e Difícil, influenciando o vocabulário das palavras.
-- **Interface Limpa:** Estética profissional com alto contraste e gestão de foco inteligente.
+- **Interface Limpa:** Estética profissional com alto contraste e gestão de foco inteligente para leitura automática do estado da palavra.
 
 ## 🛠️ Como Jogar
 
 1. Acesse: [https://concego.github.io/forca/](https://concego.github.io/forca/)
 2. Escolha o seu idioma.
-3. Selecione a dificuldade e uma categoria (ou deixe o acaso decidir no Aleatório).
+3. Selecione a dificuldade e uma categoria (ou o Modo Aleatório para misturar tudo).
 4. Use o botão **Letra** para chutar caracteres ou **Chutar Palavra** se já souber a resposta (cuidado: um erro aqui encerra o jogo!).
 5. Use o botão **Ouvir Palavra** para disparar o scan de áudio a qualquer momento.
 
