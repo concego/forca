@@ -1,4 +1,4 @@
-# 🦁 Forca Inclusiva - Eu Concego Jogar
+#  Forca Inclusiva - Eu Concego Jogar
 
 Um jogo de forca Progressive Web App (PWA) focado em acessibilidade radical e inclusão, desenvolvido para o projeto **Eu Concego Jogar**.
 
