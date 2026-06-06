@@ -87,7 +87,7 @@
 
         const data = {
             pt: {
-                labels: { title: "Escolha a Dificuldade", diff: "Nível de Dificuldade", easy: "Fácil", medium: "Médio", hard: "Difícil", cat: "Escolha a Categoria", letter: "Letra", guess: "Chutar Palavra", scan: "Ouvir Palavra", win: "VENCEU!", lose: "FIM DE JOGO: ", wrong: "Errou!", prompt: "Chute a palavra (ERRO = FIM):", errors: "Erros: ", random: "Aleatório" },
+                labels: { title: "Escolha a Dificuldade", diff: "Nível de Dificuldade", easy: "Fácil", medium: "Médio", hard: "Difícil", cat: "Escolha a Categoria", letter: "Letra", guess: "Chutar Palavra", scan: "Ouvir Palavra", win: "VENCEU!", lose: "FIM DE JOGO: ", wrong: "Errou!", prompt: "Chute a palavra (ERRO = FIM):", errors: "Erros: ", random: "Aleatório", repeated: "Já foi!" },
                 cats: {
                     artes: { 1:["PINCEL","TELA"], 2:["ESCULTURA","MOSAICO"], 3:["SURREALISMO","BARROCO"] },
                     historia: { 1:["REI","GUERRA"], 2:["IMPERIO","COLONIA"], 3:["ILUMINISMO","RENASCENCA"] },
@@ -98,7 +98,7 @@
                 }
             },
             en: {
-                labels: { title: "Choose Difficulty", diff: "Difficulty Level", easy: "Easy", medium: "Medium", hard: "Hard", cat: "Choose Category", letter: "Letter", guess: "Guess Word", scan: "Scan Word", win: "YOU WON!", lose: "GAME OVER: ", wrong: "Wrong!", prompt: "Guess the word (WRONG = LOSE):", errors: "Errors: ", random: "Random" },
+                labels: { title: "Choose Difficulty", diff: "Difficulty Level", easy: "Easy", medium: "Medium", hard: "Hard", cat: "Choose Category", letter: "Letter", guess: "Guess Word", scan: "Scan Word", win: "YOU WON!", lose: "GAME OVER: ", wrong: "Wrong!", prompt: "Guess the word (WRONG = LOSE):", errors: "Errors: ", random: "Random", repeated: "Already used!" },
                 cats: {
                     arts: { 1:["BRUSH","CANVAS"], 2:["SCULPTURE","MOSAIC"], 3:["SURREALISM","BAROQUE"] },
                     history: { 1:["KING","WAR"], 2:["EMPIRE","COLONY"], 3:["ENLIGHTENMENT","RENAISSANCE"] },
@@ -110,7 +110,11 @@
             }
         };
 
-        let lang = 'pt', diff = 1, currentWord = '', displayWord = [], errors = 0;
+        let lang = 'pt', diff = 1, currentWord = '', displayWord = [], errors = 0, usedLetters = [];
+
+        function normalize(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+        }
 
         function initMenu(l) {
             lang = l; beep(440, 0.1);
@@ -130,16 +134,12 @@
             document.getElementById('cat-label').textContent = data[lang].labels.cat;
             const btns = document.getElementById('cat-btns');
             btns.innerHTML = '';
-            
-            // Render category buttons
             Object.keys(data[lang].cats).forEach(cat => {
                 const b = document.createElement('button');
                 b.className = 'btn'; b.textContent = cat.toUpperCase();
                 b.onclick = () => startGame(cat);
                 btns.appendChild(b);
             });
-
-            // Add Random button at the end
             const randBtn = document.createElement('button');
             randBtn.className = 'btn'; randBtn.textContent = data[lang].labels.random.toUpperCase();
             randBtn.style.background = '#4527a0';
@@ -149,7 +149,6 @@
                 startGame(randomCat);
             };
             btns.appendChild(randBtn);
-
             document.getElementById('category-selection').classList.remove('hidden');
         }
 
@@ -157,7 +156,7 @@
             const list = data[lang].cats[cat][diff];
             currentWord = list[Math.floor(Math.random() * list.length)];
             displayWord = Array(currentWord.length).fill('.');
-            errors = 0;
+            errors = 0; usedLetters = [];
             document.getElementById('screen-setup').classList.add('hidden');
             document.getElementById('screen-game').classList.remove('hidden');
             const lb = data[lang].labels;
@@ -191,11 +190,25 @@
         }
 
         document.getElementById('input-field').addEventListener('input', e => {
-            const char = e.target.value.toUpperCase(); e.target.value = '';
+            let rawChar = e.target.value.toUpperCase(); e.target.value = '';
+            let char = normalize(rawChar);
             if (!char.match(/[A-Z]/)) return;
-            if (currentWord.includes(char)) {
+
+            if (usedLetters.includes(char)) {
+                beep(200, 0.1, 'square'); // Sinal sonoro curto e seco para repetida
+                update(data[lang].labels.repeated);
+                setTimeout(() => document.getElementById('word-display').focus(), 500);
+                return;
+            }
+
+            usedLetters.push(char);
+            let normalizedCurrent = normalize(currentWord);
+
+            if (normalizedCurrent.includes(char)) {
                 beep(880, 0.1);
-                for(let i=0; i<currentWord.length; i++) if(currentWord[i] === char) displayWord[i] = char;
+                for(let i=0; i<normalizedCurrent.length; i++) {
+                    if(normalizedCurrent[i] === char) displayWord[i] = currentWord[i];
+                }
                 if (!displayWord.includes('.')) win(); 
                 else {
                     update();
@@ -214,7 +227,7 @@
         function guessFull() {
             const guess = prompt(data[lang].labels.prompt);
             if (!guess) return;
-            if (guess.toUpperCase() === currentWord) {
+            if (normalize(guess) === normalize(currentWord)) {
                 displayWord = currentWord.split(''); win();
             } else {
                 errors = 6; lose();
