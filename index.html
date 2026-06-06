@@ -64,7 +64,8 @@
             <div id="p4" class="part leg-l"></div><div id="p5" class="part leg-r"></div>
         </div>
         <div id="status-msg" role="status" aria-live="polite"></div>
-        <div id="word-display" aria-label="Palavra"></div>
+        <!-- Word display agora é focável para facilitar a leitura com leitor de tela -->
+        <div id="word-display" aria-label="Palavra" tabindex="0"></div>
         <input type="text" id="input-field" maxlength="1" autocomplete="off">
         <div id="game-controls">
             <button class="btn" id="btn-letter" onclick="focusInput()"></button>
@@ -79,7 +80,7 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = type; osc.frequency.value = freq;
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime + startTime);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime + startTime);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + startTime + dur);
             osc.connect(gain); gain.connect(audioCtx.destination);
             osc.start(audioCtx.currentTime + startTime); osc.stop(audioCtx.currentTime + startTime + dur);
@@ -154,17 +155,23 @@
             document.getElementById('btn-scan').textContent = lb.scan;
             update();
             scanWord();
-            setTimeout(focusInput, 500);
+            // Focamos no display da palavra para o leitor de tela ler o estado inicial
+            setTimeout(() => document.getElementById('word-display').focus(), 1000);
         }
 
         function scanWord() {
             displayWord.forEach((char, i) => {
                 const freq = (char === '.') ? 330 : 660; 
-                beep(freq, 0.15, 'sine', i * 0.2);
+                // Aumentado o intervalo de 0.2 para 0.4 e duração para 0.25 para ficar mais calmo
+                beep(freq, 0.25, 'sine', i * 0.4);
             });
         }
 
-        function focusInput() { document.getElementById('input-field').focus(); }
+        function focusInput() { 
+            // Limpamos o campo antes de focar
+            document.getElementById('input-field').value = '';
+            document.getElementById('input-field').focus(); 
+        }
 
         function update(msg = '') {
             document.getElementById('word-display').textContent = displayWord.join('');
@@ -179,12 +186,21 @@
             if (currentWord.includes(char)) {
                 beep(880, 0.1);
                 for(let i=0; i<currentWord.length; i++) if(currentWord[i] === char) displayWord[i] = char;
-                if (!displayWord.includes('.')) win(); else scanWord();
+                if (!displayWord.includes('.')) win(); 
+                else {
+                    update();
+                    scanWord();
+                    // Após acertar, focamos na palavra para o usuário ouvir o novo estado
+                    setTimeout(() => document.getElementById('word-display').focus(), 500);
+                }
             } else {
                 errors++; beep(220, 0.2, 'sawtooth');
-                if (errors >= 6) lose(); else update(data[lang].labels.wrong);
+                if (errors >= 6) lose(); else {
+                    update(data[lang].labels.wrong);
+                    // Se errou, volta o foco para o botão de letra para facilitar nova tentativa
+                    setTimeout(() => document.getElementById('btn-letter').focus(), 500);
+                }
             }
-            update();
         });
 
         function guessFull() {
