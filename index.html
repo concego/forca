@@ -64,7 +64,7 @@
             <div id="p4" class="part leg-l"></div><div id="p5" class="part leg-r"></div>
         </div>
         <div id="status-msg" role="status" aria-live="polite"></div>
-        <div id="word-display" aria-label="Palavra" tabindex="0"></div>
+        <div id="word-display" role="text" tabindex="0"></div>
         <input type="text" id="input-field" maxlength="1" autocomplete="off">
         <div id="game-controls">
             <button class="btn" id="btn-letter" onclick="focusInput()"></button>
@@ -87,7 +87,7 @@
 
         const data = {
             pt: {
-                labels: { title: "Escolha a Dificuldade", diff: "Nível de Dificuldade", easy: "Fácil", medium: "Médio", hard: "Difícil", cat: "Escolha a Categoria", letter: "Letra", guess: "Chutar Palavra", scan: "Ouvir Palavra", win: "VENCEU!", lose: "FIM DE JOGO: ", wrong: "Errou!", prompt: "Chute a palavra (ERRO = FIM):", errors: "Erros: ", random: "Aleatório", repeated: "Já foi!" },
+                labels: { title: "Escolha a Dificuldade", diff: "Nível de Dificuldade", easy: "Fácil", medium: "Médio", hard: "Difícil", cat: "Escolha a Categoria", letter: "Letra", guess: "Chutar Palavra", scan: "Ouvir Palavra", win: "VENCEU!", lose: "FIM DE JOGO: ", wrong: "Errou!", prompt: "Chute a palavra (ERRO = FIM):", errors: "Erros: ", random: "Aleatório", repeated: "Já foi!", wordLabel: "Palavra" },
                 cats: {
                     artes: { 1:["PINCEL","TELA"], 2:["ESCULTURA","MOSAICO"], 3:["SURREALISMO","BARROCO"] },
                     historia: { 1:["REI","GUERRA"], 2:["IMPERIO","COLONIA"], 3:["ILUMINISMO","RENASCENCA"] },
@@ -98,9 +98,9 @@
                 }
             },
             en: {
-                labels: { title: "Choose Difficulty", diff: "Difficulty Level", easy: "Easy", medium: "Medium", hard: "Hard", cat: "Choose Category", letter: "Letter", guess: "Guess Word", scan: "Scan Word", win: "YOU WON!", lose: "GAME OVER: ", wrong: "Wrong!", prompt: "Guess the word (WRONG = LOSE):", errors: "Errors: ", random: "Random", repeated: "Already used!" },
+                labels: { title: "Choose Difficulty", diff: "Difficulty Level", easy: "Easy", medium: "Medium", hard: "Hard", cat: "Choose Category", letter: "Letter", guess: "Guess Word", scan: "Scan Word", win: "YOU WON!", lose: "GAME OVER: ", wrong: "Wrong!", prompt: "Guess the word (WRONG = LOSE):", errors: "Errors: ", random: "Random", repeated: "Already used!", wordLabel: "Word" },
                 cats: {
-                    arts: { 1:["BRUSH","CANVAS"], 2:["SCULPTURE","MOSAIC"], 3:["SURREALISM","BAROQUE"] },
+                    art: { 1:["BRUSH","CANVAS"], 2:["SCULPTURE","MOSAIC"], 3:["SURREALISM","BAROQUE"] },
                     history: { 1:["KING","WAR"], 2:["EMPIRE","COLONY"], 3:["ENLIGHTENMENT","RENAISSANCE"] },
                     geography: { 1:["MAP","WORLD"], 2:["PLATEAU","OCEAN"], 3:["ARCHIPELAGO","MERIDIAN"] },
                     science: { 1:["ATOM","MOON"], 2:["CELL","PLANET"], 3:["GENETICS","EVOLUTION"] },
@@ -154,7 +154,6 @@
 
             if (cat === 'random') {
                 displayCatName = data[lang].labels.random.toUpperCase();
-                // Mix all words from all categories for the selected difficulty
                 Object.values(data[lang].cats).forEach(c => {
                     list = list.concat(c[diff]);
                 });
@@ -173,6 +172,7 @@
             document.getElementById('btn-letter').textContent = lb.letter;
             document.getElementById('btn-guess').textContent = lb.guess;
             document.getElementById('btn-scan').textContent = lb.scan;
+            document.getElementById('word-display').setAttribute('aria-label', lb.wordLabel);
             update();
             scanWord();
             setTimeout(() => document.getElementById('word-display').focus(), 1000);
