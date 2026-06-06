@@ -64,7 +64,6 @@
             <div id="p4" class="part leg-l"></div><div id="p5" class="part leg-r"></div>
         </div>
         <div id="status-msg" role="status" aria-live="polite"></div>
-        <!-- Word display agora é focável para facilitar a leitura com leitor de tela -->
         <div id="word-display" aria-label="Palavra" tabindex="0"></div>
         <input type="text" id="input-field" maxlength="1" autocomplete="off">
         <div id="game-controls">
@@ -88,7 +87,7 @@
 
         const data = {
             pt: {
-                labels: { title: "Escolha a Dificuldade", diff: "Nível de Dificuldade", easy: "Fácil", medium: "Médio", hard: "Difícil", cat: "Escolha a Categoria", letter: "Letra", guess: "Chutar Palavra", scan: "Ouvir Palavra", win: "VENCEU!", lose: "FIM DE JOGO: ", wrong: "Errou!", prompt: "Chute a palavra (ERRO = FIM):", errors: "Erros: " },
+                labels: { title: "Escolha a Dificuldade", diff: "Nível de Dificuldade", easy: "Fácil", medium: "Médio", hard: "Difícil", cat: "Escolha a Categoria", letter: "Letra", guess: "Chutar Palavra", scan: "Ouvir Palavra", win: "VENCEU!", lose: "FIM DE JOGO: ", wrong: "Errou!", prompt: "Chute a palavra (ERRO = FIM):", errors: "Erros: ", random: "Aleatório" },
                 cats: {
                     artes: { 1:["PINCEL","TELA"], 2:["ESCULTURA","MOSAICO"], 3:["SURREALISMO","BARROCO"] },
                     historia: { 1:["REI","GUERRA"], 2:["IMPERIO","COLONIA"], 3:["ILUMINISMO","RENASCENCA"] },
@@ -99,7 +98,7 @@
                 }
             },
             en: {
-                labels: { title: "Choose Difficulty", diff: "Difficulty Level", easy: "Easy", medium: "Medium", hard: "Hard", cat: "Choose Category", letter: "Letter", guess: "Guess Word", scan: "Scan Word", win: "YOU WON!", lose: "GAME OVER: ", wrong: "Wrong!", prompt: "Guess the word (WRONG = LOSE):", errors: "Errors: " },
+                labels: { title: "Choose Difficulty", diff: "Difficulty Level", easy: "Easy", medium: "Medium", hard: "Hard", cat: "Choose Category", letter: "Letter", guess: "Guess Word", scan: "Scan Word", win: "YOU WON!", lose: "GAME OVER: ", wrong: "Wrong!", prompt: "Guess the word (WRONG = LOSE):", errors: "Errors: ", random: "Random" },
                 cats: {
                     arts: { 1:["BRUSH","CANVAS"], 2:["SCULPTURE","MOSAIC"], 3:["SURREALISM","BAROQUE"] },
                     history: { 1:["KING","WAR"], 2:["EMPIRE","COLONY"], 3:["ENLIGHTENMENT","RENAISSANCE"] },
@@ -131,12 +130,26 @@
             document.getElementById('cat-label').textContent = data[lang].labels.cat;
             const btns = document.getElementById('cat-btns');
             btns.innerHTML = '';
+            
+            // Render category buttons
             Object.keys(data[lang].cats).forEach(cat => {
                 const b = document.createElement('button');
                 b.className = 'btn'; b.textContent = cat.toUpperCase();
                 b.onclick = () => startGame(cat);
                 btns.appendChild(b);
             });
+
+            // Add Random button at the end
+            const randBtn = document.createElement('button');
+            randBtn.className = 'btn'; randBtn.textContent = data[lang].labels.random.toUpperCase();
+            randBtn.style.background = '#4527a0';
+            randBtn.onclick = () => {
+                const categories = Object.keys(data[lang].cats);
+                const randomCat = categories[Math.floor(Math.random() * categories.length)];
+                startGame(randomCat);
+            };
+            btns.appendChild(randBtn);
+
             document.getElementById('category-selection').classList.remove('hidden');
         }
 
@@ -155,20 +168,17 @@
             document.getElementById('btn-scan').textContent = lb.scan;
             update();
             scanWord();
-            // Focamos no display da palavra para o leitor de tela ler o estado inicial
             setTimeout(() => document.getElementById('word-display').focus(), 1000);
         }
 
         function scanWord() {
             displayWord.forEach((char, i) => {
                 const freq = (char === '.') ? 330 : 660; 
-                // Aumentado o intervalo de 0.2 para 0.4 e duração para 0.25 para ficar mais calmo
                 beep(freq, 0.25, 'sine', i * 0.4);
             });
         }
 
         function focusInput() { 
-            // Limpamos o campo antes de focar
             document.getElementById('input-field').value = '';
             document.getElementById('input-field').focus(); 
         }
@@ -190,14 +200,12 @@
                 else {
                     update();
                     scanWord();
-                    // Após acertar, focamos na palavra para o usuário ouvir o novo estado
                     setTimeout(() => document.getElementById('word-display').focus(), 500);
                 }
             } else {
                 errors++; beep(220, 0.2, 'sawtooth');
                 if (errors >= 6) lose(); else {
                     update(data[lang].labels.wrong);
-                    // Se errou, volta o foco para o botão de letra para facilitar nova tentativa
                     setTimeout(() => document.getElementById('btn-letter').focus(), 500);
                 }
             }
