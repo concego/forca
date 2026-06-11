@@ -33,7 +33,7 @@
         
         #word-display { font-size: 2.5rem; letter-spacing: 8px; margin: 25px 0; font-family: 'Courier New', Courier, monospace; min-height: 3rem; word-break: break-all; }
         #status-msg { font-size: 1.2rem; color: var(--accent); margin: 15px 0; min-height: 1.5em; font-weight: bold; }
-        #used-letters-display { font-size: 1rem; color: #aaa; margin: 10px 0; min-height: 1.2em; font-style: italic; }
+        #revealed-letters-display { font-size: 1.1rem; color: #00e5ff; margin: 10px 0; min-height: 1.2em; font-weight: 500; }
         #input-field, #guess-input-field { opacity: 0; position: absolute; pointer-events: none; }
         .diff-tag { font-size: 0.9rem; padding: 4px 8px; border-radius: 4px; background: #444; margin-bottom: 10px; display: inline-block; }
     </style>
@@ -67,7 +67,7 @@
             <div id="p4" class="part leg-l"></div><div id="p5" class="part leg-r"></div>
         </div>
         <div id="status-msg" role="status" aria-live="polite"></div>
-        <div id="used-letters-display" aria-live="polite"></div>
+        <div id="revealed-letters-display" aria-live="polite"></div>
         <div id="word-display" role="text" tabindex="0"></div>
         
         <input type="text" id="input-field" maxlength="1" autocomplete="off">
@@ -94,7 +94,7 @@
 
         const data = {
             pt: {
-                labels: { title: "Forca Inclusiva", chooseDiff: "Escolha a Dificuldade", diff: "Nível de Dificuldade", easy: "Fácil", medium: "Médio", hard: "Difícil", cat: "Escolha a Categoria", letter: "Letra", guess: "Chutar Palavra", scan: "Ouvir Palavra", win: "VENCEU!", lose: "FIM DE JOGO: ", wrong: "Errou!", prompt: "Digite a palavra inteira (CUIDADO: Erro = Fim):", errors: "Erros: ", random: "Aleatório", repeated: "Já foi!", wordLabel: "Palavra", lettersLabel: "letras", usedLabel: "Usadas: " },
+                labels: { title: "Forca Inclusiva", chooseDiff: "Escolha a Dificuldade", diff: "Nível de Dificuldade", easy: "Fácil", medium: "Médio", hard: "Difícil", cat: "Escolha a Categoria", letter: "Letra", guess: "Chutar Palavra", scan: "Ouvir Palavra", win: "VENCEU!", lose: "FIM DE JOGO: ", wrong: "Errou!", prompt: "Digite a palavra inteira (CUIDADO: Erro = Fim):", errors: "Erros: ", random: "Aleatório", repeated: "Já foi!", wordLabel: "Palavra", lettersLabel: "letras", revealedLabel: "Descobertas: " },
                 cats: {
                     artes: { 1:["PINCEL","TELA"], 2:["ESCULTURA","MOSAICO"], 3:["SURREALISMO","BARROCO"] },
                     historia: { 1:["REI","GUERRA"], 2:["IMPERIO","COLONIA"], 3:["ILUMINISMO","RENASCENCA"] },
@@ -105,7 +105,7 @@
                 }
             },
             en: {
-                labels: { title: "Inclusive Hangman", chooseDiff: "Choose Difficulty", diff: "Difficulty Level", easy: "Easy", medium: "Medium", hard: "Hard", cat: "Choose Category", letter: "Letter", guess: "Guess Word", scan: "Scan Word", win: "YOU WON!", lose: "GAME OVER: ", wrong: "Wrong!", prompt: "Type the full word (WARNING: Wrong = Lose):", errors: "Errors: ", random: "Random", repeated: "Already used!", wordLabel: "Word", lettersLabel: "letters", usedLabel: "Used: " },
+                labels: { title: "Inclusive Hangman", chooseDiff: "Choose Difficulty", diff: "Difficulty Level", easy: "Easy", medium: "Medium", hard: "Hard", cat: "Choose Category", letter: "Letter", guess: "Guess Word", scan: "Scan Word", win: "YOU WON!", lose: "GAME OVER: ", wrong: "Wrong!", prompt: "Type the full word (WARNING: Wrong = Lose):", errors: "Errors: ", random: "Random", repeated: "Already used!", wordLabel: "Word", lettersLabel: "letters", revealedLabel: "Revealed: " },
                 cats: {
                     art: { 1:["BRUSH","CANVAS"], 2:["SCULPTURE","MOSAIC"], 3:["SURREALISM","BAROQUE"] },
                     history: { 1:["KING","WAR"], 2:["EMPIRE","COLONY"], 3:["ENLIGHTENMENT","RENAISSANCE"] },
@@ -116,7 +116,7 @@
                 }
             },
             es: {
-                labels: { title: "Ahorcado Inclusivo", chooseDiff: "Elige la Dificultad", diff: "Nivel de Dificultad", easy: "Fácil", medium: "Medio", hard: "Difícil", cat: "Elige la Categoría", letter: "Letra", guess: "Adivinar Palabra", scan: "Escuchar Palabra", win: "¡GANASTE!", lose: "FIN DEL JUEGO: ", wrong: "¡Fallaste!", prompt: "Escribe la palabra completa (CUIDADO: Error = Fin):", errors: "Errores: ", random: "Aleatorio", repeated: "¡Ya usada!", wordLabel: "Palabra", lettersLabel: "letras", usedLabel: "Usadas: " },
+                labels: { title: "Ahorcado Inclusivo", chooseDiff: "Elige la Dificultad", diff: "Nivel de Dificultad", easy: "Fácil", medium: "Medio", hard: "Difícil", cat: "Elige la Categoría", letter: "Letra", guess: "Adivinar Palabra", scan: "Escuchar Palabra", win: "¡GANASTE!", lose: "FIN DEL JUEGO: ", wrong: "¡Fallaste!", prompt: "Escribe la palabra completa (CUIDADO: Error = Fin):", errors: "Errores: ", random: "Aleatorio", repeated: "¡Ya usada!", wordLabel: "Palabra", lettersLabel: "letras", revealedLabel: "Reveladas: " },
                 cats: {
                     artes: { 1:["PINCEL","TELA"], 2:["ESCULTURA","MOSAICO"], 3:["SURREALISMO","BARROCO"] },
                     historia: { 1:["REY","GUERRA"], 2:["IMPERIO","COLONIA"], 3:["ILUSTRACION","RENACIMIENTO"] },
@@ -227,7 +227,11 @@
             const lb = data[lang].labels;
             document.getElementById('word-display').textContent = displayWord.join('');
             document.getElementById('status-msg').textContent = msg || (lb.errors + errors + "/6");
-            document.getElementById('used-letters-display').textContent = lb.usedLabel + usedLetters.join(', ');
+            
+            // Filter only revealed letters (exclude dots and duplicates)
+            const revealed = [...new Set(displayWord.filter(c => c !== '.'))];
+            document.getElementById('revealed-letters-display').textContent = revealed.length > 0 ? (lb.revealedLabel + revealed.sort().join(', ')) : '';
+            
             for(let i=0; i<6; i++) document.getElementById(`p${i}`).classList.toggle('visible', i < errors);
         }
 
