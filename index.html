@@ -76,6 +76,7 @@
         <div id="game-controls">
             <button class="btn" id="btn-letter" onclick="focusInput()"></button>
             <button class="btn risk-btn" id="btn-guess" onclick="startGuessingMode()"></button>
+            <button class="btn success-btn hidden" id="btn-submit-guess" onclick="submitFullGuess()"></button>
             <button class="btn" id="btn-scan" onclick="scanWord()" style="background:#006064"></button>
         </div>
     </div>
@@ -94,7 +95,7 @@
 
         const data = {
             pt: {
-                labels: { title: "Forca Inclusiva", chooseDiff: "Escolha a Dificuldade", diff: "Nível de Dificuldade", easy: "Fácil", medium: "Médio", hard: "Difícil", cat: "Escolha a Categoria", letter: "Letra", guess: "Chutar Palavra", scan: "Ouvir Palavra", win: "VENCEU!", lose: "FIM DE JOGO: ", wrong: "Errou!", prompt: "Digite a palavra inteira (CUIDADO: Erro = Fim):", errors: "Erros: ", random: "Aleatório", repeated: "Já foi!", wordLabel: "Palavra", lettersLabel: "letras", revealedLabel: "Descobertas: " },
+                labels: { title: "Forca Inclusiva", chooseDiff: "Escolha a Dificuldade", diff: "Nível de Dificuldade", easy: "Fácil", medium: "Médio", hard: "Difícil", cat: "Escolha a Categoria", letter: "Letra", guess: "Chutar Palavra", submit: "Confirmar Chute", scan: "Ouvir Palavra", win: "VENCEU!", lose: "FIM DE JOGO: ", wrong: "Errou!", prompt: "Digite a palavra (ERRO = FIM):", errors: "Erros: ", random: "Aleatório", repeated: "Já foi!", wordLabel: "Palavra", lettersLabel: "letras", revealedLabel: "Descobertas: " },
                 cats: {
                     artes: { 1:["PINCEL","TELA"], 2:["ESCULTURA","MOSAICO"], 3:["SURREALISMO","BARROCO"] },
                     historia: { 1:["REI","GUERRA"], 2:["IMPERIO","COLONIA"], 3:["ILUMINISMO","RENASCENCA"] },
@@ -105,7 +106,7 @@
                 }
             },
             en: {
-                labels: { title: "Inclusive Hangman", chooseDiff: "Choose Difficulty", diff: "Difficulty Level", easy: "Easy", medium: "Medium", hard: "Hard", cat: "Choose Category", letter: "Letter", guess: "Guess Word", scan: "Scan Word", win: "YOU WON!", lose: "GAME OVER: ", wrong: "Wrong!", prompt: "Type the full word (WARNING: Wrong = Lose):", errors: "Errors: ", random: "Random", repeated: "Already used!", wordLabel: "Word", lettersLabel: "letters", revealedLabel: "Revealed: " },
+                labels: { title: "Inclusive Hangman", chooseDiff: "Choose Difficulty", diff: "Difficulty Level", easy: "Easy", medium: "Medium", hard: "Hard", cat: "Choose Category", letter: "Letter", guess: "Guess Word", submit: "Submit Guess", scan: "Scan Word", win: "YOU WON!", lose: "GAME OVER: ", wrong: "Wrong!", prompt: "Type the word (WRONG = LOSE):", errors: "Errors: ", random: "Random", repeated: "Already used!", wordLabel: "Word", lettersLabel: "letters", revealedLabel: "Revealed: " },
                 cats: {
                     art: { 1:["BRUSH","CANVAS"], 2:["SCULPTURE","MOSAIC"], 3:["SURREALISM","BAROQUE"] },
                     history: { 1:["KING","WAR"], 2:["EMPIRE","COLONY"], 3:["ENLIGHTENMENT","RENAISSANCE"] },
@@ -116,9 +117,9 @@
                 }
             },
             es: {
-                labels: { title: "Ahorcado Inclusivo", chooseDiff: "Elige la Dificultad", diff: "Nivel de Dificultad", easy: "Fácil", medium: "Medio", hard: "Difícil", cat: "Elige la Categoría", letter: "Letra", guess: "Adivinar Palabra", scan: "Escuchar Palabra", win: "¡GANASTE!", lose: "FIN DEL JUEGO: ", wrong: "¡Fallaste!", prompt: "Escribe la palabra completa (CUIDADO: Error = Fin):", errors: "Errores: ", random: "Aleatorio", repeated: "¡Ya usada!", wordLabel: "Palabra", lettersLabel: "letras", revealedLabel: "Reveladas: " },
+                labels: { title: "Ahorcado Inclusivo", chooseDiff: "Elige la Dificultad", diff: "Nivel de Dificultad", easy: "Fácil", medium: "Medio", hard: "Difícil", cat: "Elige la Categoría", letter: "Letra", guess: "Adivinar Palabra", submit: "Confirmar Palabra", scan: "Escuchar Palabra", win: "¡GANASTE!", lose: "FIN DEL JUEGO: ", wrong: "¡Fallaste!", prompt: "Escribe la palabra (FALLO = FIN):", errors: "Errores: ", random: "Aleatorio", repeated: "¡Ya usada!", wordLabel: "Palabra", lettersLabel: "letras", revealedLabel: "Reveladas: " },
                 cats: {
-                    artes: { 1:["PINCEL","TELA"], 2:["ESCULTURA","MOSAICO"], 3:["SURREALISMO","BARROCO"] },
+                    artes: { 1:["PINCEL","LIENZO"], 2:["ESCULTURA","MOSAICO"], 3:["SURREALISMO","BARROCO"] },
                     historia: { 1:["REY","GUERRA"], 2:["IMPERIO","COLONIA"], 3:["ILUSTRACION","RENACIMIENTO"] },
                     geografia: { 1:["MAPA","TIERRA"], 2:["MESETA","OCEANO"], 3:["ARCHIPIELAGO","MERIDIANO"] },
                     ciencia: { 1:["ATOMO","LUNA"], 2:["CELULA","PLANETA"], 3:["GENETICA","EVOLUCION"] },
@@ -190,6 +191,7 @@
             document.getElementById('game-info').textContent = `${displayCatName} | ${diffName.toUpperCase()} | ${currentWord.length} ${lb.lettersLabel.toUpperCase()}`;
             document.getElementById('btn-letter').textContent = lb.letter;
             document.getElementById('btn-guess').textContent = lb.guess;
+            document.getElementById('btn-submit-guess').textContent = lb.submit;
             document.getElementById('btn-scan').textContent = lb.scan;
             
             const wordLabel = `${lb.wordLabel}, ${currentWord.length} ${lb.lettersLabel}`;
@@ -209,26 +211,50 @@
 
         function focusInput() { 
             isGuessingMode = false;
+            document.getElementById('btn-guess').classList.remove('hidden');
+            document.getElementById('btn-submit-guess').classList.add('hidden');
             const field = document.getElementById('input-field');
             field.value = '';
             field.focus(); 
+            update();
         }
 
         function startGuessingMode() {
             isGuessingMode = true;
             const msg = data[lang].labels.prompt;
             document.getElementById('status-msg').textContent = msg;
+            document.getElementById('btn-guess').classList.add('hidden');
+            document.getElementById('btn-submit-guess').classList.remove('hidden');
             const field = document.getElementById('guess-input-field');
             field.value = '';
             field.focus();
         }
 
+        function submitFullGuess() {
+            const field = document.getElementById('guess-input-field');
+            const guess = field.value;
+            field.value = '';
+            
+            if (!guess) {
+                focusInput();
+                return;
+            }
+            
+            if (normalize(guess) === normalize(currentWord)) {
+                displayWord = currentWord.split(''); win();
+            } else {
+                errors = 6; lose();
+            }
+        }
+
         function update(msg = '') {
             const lb = data[lang].labels;
             document.getElementById('word-display').textContent = displayWord.join('');
-            document.getElementById('status-msg').textContent = msg || (lb.errors + errors + "/6");
             
-            // Filter only revealed letters (exclude dots and duplicates)
+            // Fixed the status message logic to always show errors
+            const errorStatus = lb.errors + errors + "/6";
+            document.getElementById('status-msg').textContent = msg ? (msg + " (" + errorStatus + ")") : errorStatus;
+            
             const revealed = [...new Set(displayWord.filter(c => c !== '.'))];
             document.getElementById('revealed-letters-display').textContent = revealed.length > 0 ? (lb.revealedLabel + revealed.sort().join(', ')) : '';
             
@@ -272,18 +298,7 @@
 
         document.getElementById('guess-input-field').addEventListener('keydown', e => {
             if (e.key === 'Enter') {
-                const guess = e.target.value;
-                e.target.value = '';
-                if (!guess) {
-                    isGuessingMode = false;
-                    update();
-                    return;
-                }
-                if (normalize(guess) === normalize(currentWord)) {
-                    displayWord = currentWord.split(''); win();
-                } else {
-                    errors = 6; lose();
-                }
+                submitFullGuess();
             }
         });
 
