@@ -6,8 +6,8 @@ O **Forca Inclusiva** é um Progressive Web App (PWA) desenvolvido para ser a ve
 
 - **Acessibilidade Nativa:** Design inclusivo com suporte total a leitores de tela (NVDA, TalkBack, etc.).
 - **Feedback Auditivo (Scan de Áudio):** Sistema de varredura sonora da palavra secreta:
-  - **Bipe Grave (330Hz):** Representa letras ocultas (pontos).
-  - **Bipe Agudo (660Hz):** Representa letras já reveladas.
+ - **Bipe Grave (330Hz):** Representa letras ocultas (pontos).
+ - **Bipe Agudo (660Hz):** Representa letras já reveladas.
 - **Normalização Inteligente:** Aceita caracteres de A a Z. Letras com acentos ou cedilha (ex: Á, Ã, Ç) são validadas automaticamente ao digitar a letra base (ex: A, C).
 - **Tratamento de Repetições:** Tentar uma letra já usada emite um sinal sonoro diferenciado e não desconta pontos/vidas.
 - **Localização Estrita (Bilíngue):** Interface 100% dinâmica em **Português** e **Inglês**, sem mistura de terminologias.
@@ -24,7 +24,7 @@ O **Forca Inclusiva** é um Progressive Web App (PWA) desenvolvido para ser a ve
 4. Use o botão **Letra** para chutar caracteres ou **Chutar Palavra** se já souber a resposta (cuidado: um erro aqui encerra o jogo!).
 5. Use o botão **Ouvir Palavra** para disparar o scan de áudio a qualquer momento.
 
-## ♿ Inclusão acima de Acessibilidade
+## Inclusão acima de Acessibilidade
 
 O projeto segue a filosofia de que o jogo não deve ser apenas "acessível", mas sim uma experiência compartilhada. O uso de pontos finais (`.`) para representar letras ocultas garante que o leitor de tela leia a estrutura da palavra de forma clara, enquanto o scan de áudio fornece o mapeamento espacial para o jogador.
 
